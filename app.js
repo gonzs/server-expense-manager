@@ -1,29 +1,27 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require("body-parser");
 
 const app = express();
 
-// Load files
+// Load routes files
+const expense_routes = require("./Routes/expense");
 
 // Middlewares
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // CORS
+// Configurar cabeceras y cors
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
+});
 
 // Routes
-app.get('/', (req, res) => {
-    res.status(200).send(
-        "<h1>Home Page</h1>"
-    );
-});
-
-app.get('/test', (req, res) => {
-    res.status(200).send({
-        message: 'Hellow world from test route'
-    });
-});
-
+app.use("/api", expense_routes);
 
 // Export
 module.exports = app;

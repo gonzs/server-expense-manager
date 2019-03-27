@@ -1,11 +1,11 @@
-var mongoose = require('mongoose');
-var schema = mongoose.Schema;
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
 
-var expenseSchema = schema({
-    id: Number,
-    category: String,
-    text: String,
-    value: Number,
+var expenseSchema = Schema({
+  id: Number,
+  category: String,
+  text: String,
+  value: Number
 });
 
-module.exports = mongoose.model('Expense',expenseSchema);
+module.exports = mongoose.model("Expense", expenseSchema);
