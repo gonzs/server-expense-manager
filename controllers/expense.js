@@ -1,5 +1,7 @@
 const Expense = require("../models/expense");
 
+let nextId = 1;
+
 const controller = {
   home: (req, res) => {
     return res.status(200).send({
@@ -16,7 +18,7 @@ const controller = {
   saveExpense: (req, res) => {
     let expense = new Expense();
     let params = req.body;
-    expense.id = params.id;
+    expense.id = nextId++;
     expense.category = params.category;
     expense.text = params.text;
     expense.value = params.value;
@@ -31,6 +33,7 @@ const controller = {
           message: "Expense cannot be saved"
         });
 
+      console.log(expenseStored);
       return res.status(200).send({
         expense: expenseStored
       });
