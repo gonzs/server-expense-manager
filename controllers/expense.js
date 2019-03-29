@@ -1,69 +1,67 @@
 const Expense = require("../models/expense");
 
-let nextId = 1;
-
 const controller = {
-  home: (req, res) => {
-    return res.status(200).send({
-      message: "Home Page"
-    });
-  },
-
-  test: (req, res) => {
-    return res.status(200).send({
-      message: "Test Page"
-    });
-  },
-
+  //API: Save Expense into DB
   saveExpense: (req, res) => {
-    let expense = new Expense();
-    let params = req.body;
-    expense.id = nextId++;
-    expense.category = params.category;
-    expense.text = params.text;
-    expense.value = params.value;
-
-    expense.save((err, expenseStored) => {
+    //Get last ID saved
+    Expense.findOne({}, (err, lastExpense) => {
       if (err)
         return res.status(500).send({
-          message: "Error in saveExpense API method"
-        });
-      if (!expenseStored)
-        return res.status(404).send({
-          message: "Expense cannot be saved"
+          message: "Error when retrieving Expense"
         });
 
-      console.log(expenseStored);
-      return res.status(200).send({
-        expense: expenseStored
-      });
-    });
-  },
+      let params = req.body;
+      newExpense = new Expense();
 
-  getExpenses: (req, res) => {
-    Expense.find({})
-      .sort("category")
-      .exec((err, expenses) => {
+      if (!lastExpense) newExpense.id = 1;
+      // First id
+      else newExpense.id = lastExpense.id + 1; // Last id + 1
+
+      newExpense.category = params.category;
+      newExpense.text = params.text;
+      newExpense.value = params.value;
+
+      // Save into DB
+      newExpense.save((err, expenseStored) => {
         if (err)
           return res.status(500).send({
-            message: "Error when retrieving Expenses"
+            message: "Error in saveExpense API method"
           });
-
-        if (!expenses)
+        if (!expenseStored)
           return res.status(404).send({
-            message: "Expenses not found"
+            message: "Expense cannot be saved"
           });
 
         return res.status(200).send({
-          expenses
+          expense: expenseStored
         });
       });
+    }).sort("-id");
   },
 
+  // API: Get all Expenses
+  getExpenses: (req, res) => {
+    Expense.find({}).exec((err, expenses) => {
+      if (err)
+        return res.status(500).send({
+          message: "Error when retrieving Expenses"
+        });
+
+      if (!expenses)
+        return res.status(404).send({
+          message: "Expenses not found"
+        });
+
+      return res.status(200).send({
+        expenses
+      });
+    });
+  },
+
+  // API: Get an Expense by ID
   getExpense: (req, res) => {
     let expenseId = req.params.id;
 
-    //Expense.findById(expenseId, (err, expense) => {
     Expense.find({ id: expenseId }, (err, expense) => {
       if (err)
         return res.status(500).send({
@@ -80,6 +78,7 @@ const controller = {
     });
   },
 
+  // API: Update an Expense
   updateExpense: (req, res) => {
     let expenseId = req.params.id;
     let update = req.body;
@@ -106,6 +105,7 @@ const controller = {
     );
   },
 
+  // API: Delete an Expense
   deleteExpense: (req, res) => {
     let expenseId = req.params.id;
 
